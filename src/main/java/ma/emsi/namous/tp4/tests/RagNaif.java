@@ -20,6 +20,10 @@ import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
+import dev.langchain4j.rag.query.transformer.CompressingQueryTransformer;
+import dev.langchain4j.rag.query.transformer.QueryTransformer;
+import dev.langchain4j.rag.RetrievalAugmentor;
+import dev.langchain4j.rag.DefaultRetrievalAugmentor;
 
 import java.util.List;
 import java.util.Scanner;
@@ -59,12 +63,21 @@ public class RagNaif {
                 .maxResults(2)
                 .minScore(0.5)
                 .build();
+
+        QueryTransformer queryTransformer =
+                new CompressingQueryTransformer(model);
+
+        RetrievalAugmentor retrievalAugmentor = DefaultRetrievalAugmentor.builder()
+                .queryTransformer(queryTransformer)
+                .contentRetriever(contentRetriever)
+                .build();
+
         ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(10);
 
         Assistant assistant = AiServices.builder(Assistant.class)
                 .chatModel(model)
                 .chatMemory(chatMemory)
-                .contentRetriever(contentRetriever)
+                .retrievalAugmentor(retrievalAugmentor)
                 .build();
 
         // Code que j'ai pris de TP2
