@@ -28,7 +28,9 @@ import dev.langchain4j.rag.query.router.QueryRouter;
 import dev.langchain4j.rag.query.router.DefaultQueryRouter;
 import dev.langchain4j.rag.RetrievalAugmentor;
 import dev.langchain4j.rag.DefaultRetrievalAugmentor;
+import dev.langchain4j.rag.query.router.LanguageModelQueryRouter;
 
+import java.util.Map;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
@@ -74,10 +76,30 @@ public class Test4 {
                         .webSearchEngine(webSearchEngine)
                         .build();
 
-        QueryRouter queryRouter = new DefaultQueryRouter(
-                contentRetriever,
-                webContentRetriever
+//        QueryRouter queryRouter = new DefaultQueryRouter(
+//                contentRetriever,
+//                webContentRetriever
+//        );
+
+        /*
+         * Version initiale du Test 5 :
+         * les deux retrievers sont utilisés systématiquement,
+         * même lorsque le PDF n'est pas pertinent.
+         *
+         * QueryRouter queryRouter = new DefaultQueryRouter(
+         *         contentRetriever,
+         *         webContentRetriever
+         * );
+         */
+
+        Map<ContentRetriever, String> retrievers = Map.of(
+                contentRetriever, "Support de cours sur l'IA, le fine-tuning, le RAG et les modèles de langage.",
+
+                webContentRetriever, "Recherche sur Internet pour les actualités récentes, les événements, les informations à jour et les questions sans rapport avec le cours PDF."
         );
+
+        QueryRouter queryRouter =
+                new LanguageModelQueryRouter(model, retrievers);
 
         RetrievalAugmentor retrievalAugmentor =
                 DefaultRetrievalAugmentor.builder()
