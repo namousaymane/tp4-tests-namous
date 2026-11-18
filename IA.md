@@ -1,0 +1,1 @@
+Aucun usage d'IA pour réaliser ce tp
